@@ -2,7 +2,7 @@
 ## Udacity's Self-Driving Car Engineer Nanodegree Program
 ---
 # PID Controller Project
-### Using Error Backpropagation to Update individual parameters
+### Using Gradient Descent with Error Backpropagation to Update Individual Parameters
 ---
 
 Parameters have been initially set to those derived in Project's Lesson by Sebastian Thrun using twiddle:
@@ -27,7 +27,7 @@ void PID::adjust(double &Kx, double dx, double dE) {
 }
 ```
 
-it computes individual (one of three among `Kp`, `Ki` and `Kd`) parameters' contribution to the total error and 
+It computes individual (one of three among `Kp`, `Ki` and `Kd`) parameters' contribution to the total error and 
 updates it accordingly.
 
 The function that updates the steering value is defined as:
@@ -40,16 +40,15 @@ that function must be viewed as `f(Kp, Ki, Kd)` with the partial derivatives equ
 
 **The tricky part** is with `i_error`. Since I evaluate cumulative error through some number of iterations (say, `200`),
 and each iteration's **CTE** might be both positive or negative, their raw summation (which is `i_error`) doesn't
-represent the magnitude of that parameter with positives and negatives canceling each other out. To address the issue, 
-I've introduced the new variable (creatively called it `i_e_fabs_`), that accumulates absolute values of CTE throughout
-the epoch, and use it as a measure of the partial derivative for `Ki`.
+represent the magnitude of that parameter as positives and negatives cancel each other out. To address the issue, 
+I've introduced the new variable (creatively called it `i_e_fabs_`), that accumulates absolute values of **CTE**
+throughout the epoch, and use it as a measure of the partial derivative for `Ki`.
 
 [The video](https://youtu.be/PDvEPJj8Nmg) illustrates the training process. 
 
-It can be seen that the **backpropagation**
-updates are mostly concerned about `Ki`, with `Kp` and `Kd` staying pretty much unchanged around `0.2` and `3.0`.
-`Ki` **rapidly drops by one order of magnitude** to some value around `0.0003` or `3e-4`, having even gone to the
-negative territory for a brief period of time.
+It can be seen that the **backpropagation** updates are mostly concerned about `Ki`, with `Kp` and `Kd` staying pretty
+much unchanged and oscillating around `0.2` and `3.0`, while `Ki` **rapidly drops by one order of magnitude** to some
+value around `0.0003` or `3e-4`, having even gone to the negative territory for a brief period of time.
 
 ---
 ##### Basic Build Instructions
@@ -59,4 +58,5 @@ negative territory for a brief period of time.
 3. Compile: `cmake .. && make`
 4. Run it: `./pid`. 
 
-Alternatively, there are convenient scripts created by Tiffany Huang: `clean.sh`, `build.sh`.
+Alternatively, there are convenient scripts provided by Tiffany Huang for
+[Particle Filter project](https://github.com/antevis/CarND-T2-P3_ParticleFilter): `clean.sh`, `build.sh`.
