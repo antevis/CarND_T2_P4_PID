@@ -48,7 +48,8 @@ the epoch, and use it as a measure of the partial derivative for `Ki`.
 
 It can be seen that the **backpropagation**
 updates are mostly concerned about `Ki`, with `Kp` and `Kd` staying pretty much unchanged around `0.2` and `3.0`.
-`Ki` **rapidly drops by one order of magnitude** to some value around `0.0003` or `3e-4`.
+`Ki` **rapidly drops by one order of magnitude** to some value around `0.0003` or `3e-4`, having even gone to the
+negative territory for a brief period of time.
 
 ---
 ##### Basic Build Instructions
