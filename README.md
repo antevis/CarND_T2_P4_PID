@@ -13,8 +13,7 @@ Ki = 0.004
 kd = 3.0
 ```
 
-I employed backpropagation to evaluate each of three parameters' contribution to the total error
-and update them accordingly using function listed below:
+I implemented **backpropagation** in the following function:
 
 ```c++
 /**
@@ -28,21 +27,26 @@ void PID::adjust(double &Kx, double dx, double dE) {
 }
 ```
 
+it computes individual (one of three among `Kp`, `Ki` and `Kd`) parameters' contribution to the total error and 
+updates it accordingly.
+
 The function that updates the steering value is defined as:
 
 `f(p_err, i_err, d_err) = -Kp * p_err - Ki * i_err - Kd * d_err`
 
 Since I am tuning `Kp`, `Ki` and `Kd`, to obtain partial derivatives **with respect to** `Kp`, `Ki` and `Kd`,
-that function must be viewed as `f(Kp, Ki, Kd)` with the partial derivatives derivatives equal to 
+that function must be viewed as `f(Kp, Ki, Kd)` with the partial derivatives equal to 
 `-p_error`, `-i_error` and `-d_error` accordingly.
 
-The tricky part is with `i_error`. Since I evaluate cumulative error through some number of iterations (say, `200`),
-and each iteration's CTE might be both positive or negative, their raw summation (which is `i_error`) doesn't repersent
-the magnitude of that parameter with positives and negatives cancelling each other out. To address the issue, 
+**The tricky part** is with `i_error`. Since I evaluate cumulative error through some number of iterations (say, `200`),
+and each iteration's **CTE** might be both positive or negative, their raw summation (which is `i_error`) doesn't
+represent the magnitude of that parameter with positives and negatives canceling each other out. To address the issue, 
 I've introduced the new variable (creatively called it `i_e_fabs_`), that accumulates absolute values of CTE throughout
-the epoch, and use it as a measure of partial derivative for `Ki`.
+the epoch, and use it as a measure of the partial derivative for `Ki`.
 
-[The video](https://youtu.be/PDvEPJj8Nmg) illustrates the training process. It can be seen that the **backpropagation**
+[The video](https://youtu.be/PDvEPJj8Nmg) illustrates the training process. 
+
+It can be seen that the **backpropagation**
 updates are mostly concerned about `Ki`, with `Kp` and `Kd` staying pretty much unchanged around `0.2` and `3.0`.
 `Ki` **rapidly drops by one order of magnitude** to some value around `0.0003` or `3e-4`.
 
