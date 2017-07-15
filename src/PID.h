@@ -74,7 +74,7 @@ private:
      * avoiding positive-negative cancelling each other.
      */
     double i_e_fabs_;
-
+    
     /**
      * Coefficients
      */

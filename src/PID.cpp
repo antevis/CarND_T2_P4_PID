@@ -5,8 +5,8 @@
 //using namespace std;
 
 /*
-* TODO: Complete the PID class.
-*/
+ * TODO: Complete the PID class.
+ */
 
 PID::PID() {}
 
@@ -47,7 +47,7 @@ void PID::resetEpochError() {
 void PID::evaluate() {
     // Permanently stop training once criteria has been met.
     if (needsTraining_) {
-        currentEpochError_ = sqrt(epochCumulativeError_ / counter_);
+        currentEpochError_ = sqrt(epochCumulativeError_ / epochLength_);
         needsTraining_ = currentEpochError_ > errorThreshold_;
     }
 }
