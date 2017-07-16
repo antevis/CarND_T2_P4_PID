@@ -39,7 +39,6 @@ void PID::updateEpochError(double cte) {
 }
 
 void PID::resetEpochError() {
-    
     i_e_fabs_ = 0;
     epochCumulativeError_ = 0;
 }
@@ -70,44 +69,23 @@ double PID::getKp() const { return Kp; }
 double PID::getKi() const { return Ki; }
 double PID::getKd() const { return Kd; }
 
+
+/** Since I tune Kp, Ki and Kd parameters, partial derivatives of f(Kp, Ki, Kd) = -Kp * p_error - Ki * i_error - Kd * d_error
+ * WITH RESPECT TO Kp, Ki, Kd are -p_error, -i_error and -d_error respectively.
+ *
+ * There's a bit cheating with i_error here. Since I evaluate cumulative error through some number of iterations (say, 200),
+ * and each iteration's CTE might be both positive or negative, their raw summation (which is i_error) doesn't repersent the
+ * magnitude of that paramteter with positives and negatives cancelling each other out. To address the issue, I've introduced
+ * new variable i_e_fabs_, that accumulates absolute values of CTE throughout the epoch, and use it as a measure of partial
+ * derivative for Ki.
+ */
 void PID::backProp() {
     double deltaError = previousEpochError_ - currentEpochError_;
     previousEpochError_ = currentEpochError_;
     
-    // For terminal output.
-    double prevKi = Ki;
-    double prevKp = Kp;
-    double prevKd = Kd;
-    
-    /** Since I tune Kp, Ki and Kd parameters, partial derivatives of f(Kp, Ki, Kd) = -Kp * p_error - Ki * i_error - Kd * d_error
-     * WITH RESPECT TO Kp, Ki, Kd are -p_error, -i_error and -d_error respectively.
-     *
-     * There's a bit cheating with i_error here. Since I evaluate cumulative error through some number of iterations (say, 200),
-     * and each iteration's CTE might be both positive or negative, their raw summation (which is i_error) doesn't repersent the
-     * magnitude of that paramteter with positives and negatives cancelling each other out. To address the issue, I've introduced
-     * new variable i_e_fabs_, that accumulates absolute values of CTE throughout the epoch, and use it as a measure of partial
-     * derivative for Ki.
-     */
-    
-    std::cout << "Backpropagating partial error for each" << std::endl;
-    std::cout << "of three parameters Kp, Ki, Kd" << std::endl;
     adjust(Kp, -p_error, deltaError);
     adjust(Ki, -i_e_fabs_, deltaError);
     adjust(Kd, -d_error, deltaError);
-    
-    // Printing all these in a column just for a better positioning within a video frame to the left of the simulator window.
-    printMessage("prev. error: ", previousEpochError_);
-    printMessage("dE (delta total error): ", deltaError);
-    printMessage("dP: ", -p_error);
-    printMessage("dI: ", -i_e_fabs_);
-    printMessage("dD: ", -d_error);
-    printMessage("pDKp: ", prevKp - Kp);
-    printMessage("pDKi: ", prevKi - Ki);
-    printMessage("pDKd: ", prevKd - Kd);
-    printMessage("New Kp: ", Kp);
-    printMessage("New Ki: ", Ki);
-    printMessage("New Kd: ", Kd);
-    std::cout << std::endl;
 }
 
 void PID::UpdateError(double cte) {
